@@ -1,36 +1,19 @@
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Страница загружена! Инициализация...');
+    console.log('Страница загружена');
     
-    // ===== ОСНОВНЫЕ ЭЛЕМЕНТЫ =====
+    // ===== КНОПКИ УСЛУГ =====
     const serviceButtons = document.querySelectorAll('.btn-service');
     const serviceTypeSelect = document.getElementById('service-type');
     const selectedServiceInput = document.getElementById('selected-service');
-    const orderForm = document.getElementById('main-form');
-    const successMessage = document.getElementById('success-message');
-    const consultModal = document.getElementById('consult-modal');
-    const consultForm = document.getElementById('consult-form');
-    const consultBtn = document.getElementById('consult-btn');
-    const closeModalBtn = document.querySelector('.close-modal');
     
-    // ===== ПРОВЕРКА =====
-    console.log('Элементы найдены:');
-    console.log('Кнопки услуг:', serviceButtons.length);
-    console.log('Форма заказа:', orderForm ? 'Да' : 'Нет');
-    console.log('Модальное окно:', consultModal ? 'Да' : 'Нет');
-    
-    // ===== ОБРАБОТКА КНОПОК УСЛУГ =====
     serviceButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
+        button.addEventListener('click', function() {
             const service = this.getAttribute('data-service');
-            console.log('Нажата кнопка услуги:', service);
             
-            // Устанавливаем услугу в форму
             if (selectedServiceInput) {
                 selectedServiceInput.value = service;
             }
             
-            // Выбираем в селекте
             if (serviceTypeSelect) {
                 for (let i = 0; i < serviceTypeSelect.options.length; i++) {
                     if (serviceTypeSelect.options[i].value === service) {
@@ -43,46 +26,29 @@ document.addEventListener('DOMContentLoaded', function() {
             // Прокрутка к форме
             const orderSection = document.getElementById('order-form');
             if (orderSection) {
-                window.scrollTo({
-                    top: orderSection.offsetTop - 100,
-                    behavior: 'smooth'
-                });
-                
-                // Подсвечиваем форму
-                orderSection.style.boxShadow = '0 0 0 5px rgba(52, 152, 219, 0.3)';
-                setTimeout(() => {
-                    orderSection.style.boxShadow = '';
-                }, 2000);
+                orderSection.scrollIntoView({ behavior: 'smooth' });
             }
         });
     });
     
-    // ===== МОДАЛЬНОЕ ОКНО КОНСУЛЬТАЦИИ =====
+    // ===== МОДАЛЬНОЕ ОКНО =====
+    const consultModal = document.getElementById('consult-modal');
+    const consultBtn = document.getElementById('consult-btn');
+    const closeModalBtn = document.querySelector('.close-modal');
+    
     // Открытие
     if (consultBtn && consultModal) {
         consultBtn.addEventListener('click', function() {
-            console.log('Открытие модального окна');
             consultModal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
-            
-            // Анимация появления
-            consultModal.style.opacity = '0';
-            setTimeout(() => {
-                consultModal.style.opacity = '1';
-                consultModal.style.transition = 'opacity 0.3s';
-            }, 10);
         });
     }
     
-    // Закрытие по крестику
+    // Закрытие
     if (closeModalBtn && consultModal) {
         closeModalBtn.addEventListener('click', function() {
-            console.log('Закрытие модального окна');
-            consultModal.style.opacity = '0';
-            setTimeout(() => {
-                consultModal.style.display = 'none';
-                document.body.style.overflow = 'auto';
-            }, 300);
+            consultModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
         });
     }
     
@@ -90,36 +56,23 @@ document.addEventListener('DOMContentLoaded', function() {
     if (consultModal) {
         consultModal.addEventListener('click', function(e) {
             if (e.target === consultModal) {
-                console.log('Закрытие по клику вне окна');
-                consultModal.style.opacity = '0';
-                setTimeout(() => {
-                    consultModal.style.display = 'none';
-                    document.body.style.overflow = 'auto';
-                }, 300);
+                consultModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
             }
         });
     }
     
-    // Закрытие по Escape
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && consultModal && consultModal.style.display === 'flex') {
-            console.log('Закрытие по Escape');
-            consultModal.style.opacity = '0';
-            setTimeout(() => {
-                consultModal.style.display = 'none';
-                document.body.style.overflow = 'auto';
-            }, 300);
-        }
-    });
+    // ===== ФОРМЫ =====
+    const orderForm = document.getElementById('main-form');
+    const successMessage = document.getElementById('success-message');
+    const consultForm = document.getElementById('consult-form');
     
-    // ===== ОБРАБОТКА ФОРМ =====
     // Форма заказа
     if (orderForm) {
         orderForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            console.log('Отправка формы заказа');
             
-            // Простая валидация
+            // Валидация
             const name = document.getElementById('name');
             const phone = document.getElementById('phone');
             const email = document.getElementById('email');
@@ -127,7 +80,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             let valid = true;
             
-            // Валидация имени
             if (!name.value.trim()) {
                 showError(name, 'Введите имя');
                 valid = false;
@@ -135,24 +87,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 clearError(name);
             }
             
-            // Валидация телефона
             if (!phone.value.trim() || phone.value.replace(/\D/g, '').length < 11) {
-                showError(phone, 'Введите корректный телефон');
+                showError(phone, 'Введите телефон');
                 valid = false;
             } else {
                 clearError(phone);
             }
             
-            // Валидация email
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!email.value.trim() || !emailRegex.test(email.value)) {
-                showError(email, 'Введите корректный email');
+                showError(email, 'Введите email');
                 valid = false;
             } else {
                 clearError(email);
             }
             
-            // Валидация согласия
             if (!agreement.checked) {
                 showError(agreement, 'Необходимо согласие');
                 valid = false;
@@ -160,28 +109,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 clearError(agreement);
             }
             
-            if (!valid) {
-                console.log('Форма не прошла валидацию');
-                return;
-            }
-            
-            // Имитация отправки
-            console.log('Данные формы:', {
-                name: name.value,
-                phone: phone.value,
-                email: email.value,
-                service: serviceTypeSelect ? serviceTypeSelect.value : 'Не указано'
-            });
+            if (!valid) return;
             
             // Показываем успех
             orderForm.style.display = 'none';
             if (successMessage) {
                 successMessage.style.display = 'block';
-                successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                successMessage.scrollIntoView({ behavior: 'smooth' });
             }
-            
-            // Можно очистить форму
-            // orderForm.reset();
         });
     }
     
@@ -189,9 +124,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (consultForm) {
         consultForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            console.log('Отправка формы консультации');
             
-            // Простая валидация
+            // Валидация
             const inputs = consultForm.querySelectorAll('input[required]');
             let valid = true;
             
@@ -206,17 +140,13 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (!valid) return;
             
-            // Имитация отправки
-            console.log('Консультация запрошена');
+            // Сообщение
             alert('Спасибо! Мы перезвоним вам в течение 15 минут.');
             
             // Закрываем модалку
             if (consultModal) {
-                consultModal.style.opacity = '0';
-                setTimeout(() => {
-                    consultModal.style.display = 'none';
-                    document.body.style.overflow = 'auto';
-                }, 300);
+                consultModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
             }
             
             // Очищаем форму
@@ -228,10 +158,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const phoneInputs = document.querySelectorAll('input[type="tel"]');
     
     phoneInputs.forEach(input => {
-        input.addEventListener('input', function(e) {
+        input.addEventListener('input', function() {
             let value = this.value.replace(/\D/g, '');
             
-            // Форматирование
             let formatted = '';
             if (value.length > 0) {
                 formatted = '+7';
@@ -250,41 +179,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             this.value = formatted;
-            
-            // Проверка длины
-            if (value.length === 11) {
-                clearError(this);
-            }
-        });
-        
-        // При вставке
-        input.addEventListener('paste', function(e) {
-            e.preventDefault();
-            const text = (e.clipboardData || window.clipboardData).getData('text');
-            const numbers = text.replace(/\D/g, '');
-            this.value = numbers;
-            this.dispatchEvent(new Event('input'));
-        });
-    });
-    
-    // ===== ПЛАВНАЯ ПРОКРУТКА =====
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            const href = this.getAttribute('href');
-            if (href === '#') return;
-            
-            e.preventDefault();
-            
-            const target = document.querySelector(href);
-            if (target) {
-                const headerHeight = document.querySelector('.header').offsetHeight;
-                const targetPos = target.offsetTop - headerHeight - 20;
-                
-                window.scrollTo({
-                    top: targetPos,
-                    behavior: 'smooth'
-                });
-            }
         });
     });
     
@@ -298,7 +192,6 @@ document.addEventListener('DOMContentLoaded', function() {
         errorDiv.style.color = '#e74c3c';
         errorDiv.style.fontSize = '14px';
         errorDiv.style.marginTop = '8px';
-        errorDiv.style.fontWeight = '600';
         errorDiv.textContent = message;
         
         if (element.type === 'checkbox') {
@@ -313,30 +206,4 @@ document.addEventListener('DOMContentLoaded', function() {
         const errorMsg = element.parentNode.querySelector('.error-message');
         if (errorMsg) errorMsg.remove();
     }
-    
-    // ===== ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ ОШИБОК =====
-    const errorStyles = document.createElement('style');
-    errorStyles.textContent = `
-        .error {
-            border-color: #e74c3c !important;
-            background-color: #fff8f8 !important;
-        }
-        
-        .error:focus {
-            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2) !important;
-        }
-        
-        input.error, select.error, textarea.error {
-            animation: shake 0.5s ease;
-        }
-        
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
-        }
-    `;
-    document.head.appendChild(errorStyles);
-    
-    console.log('Инициализация завершена успешно!');
 });
